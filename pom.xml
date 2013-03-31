@@ -11,7 +11,7 @@
     
     <groupId>org.helgoboss</groupId>
     <artifactId>my-scala-oss-parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>My OSS Parent POM</name>
     <description>Common parent POM for all my Scala projects which are supposed to be published on Sonatype OSS</description>
