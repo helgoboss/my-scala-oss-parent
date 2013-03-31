@@ -9,11 +9,11 @@
     </parent>
     
     <groupId>org.helgoboss</groupId>
-    <artifactId>my-oss-parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>my-scala-oss-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>My OSS Parent POM</name>
-    <description>Parent POM for my Sonatype OSS projects</description>
+    <description>Parent POM for my Scala Sonatype OSS projects</description>
     
     
     <url>https://github.com/helgoboss/my-oss-parent</url>
@@ -36,14 +36,42 @@
         </developer>
     </developers>
     
+    <build>
+        <sourceDirectory>${basedir}/src/main/scala</sourceDirectory>
+    </build>
+    
     <profiles>
         <profile>
             <id>sonatype-oss-release</id>
             <build>
                 <plugins>
+                
+                    <!-- Unpack dependency sources of helgoboss projects so Scaladoc can include them -->
                     <plugin>
-                        <groupId>org.scala-tools</groupId>
-                        <artifactId>maven-scala-plugin</artifactId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.6</version>
+                        <executions>
+                          <execution>
+                            <id>unpack-sources</id>
+                            <goals>
+                              <goal>unpack-dependencies</goal>
+                            </goals>
+                            <configuration>
+                              <outputDirectory>${project.build.directory}/sources</outputDirectory>
+                              <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
+                              <classifier>sources</classifier>
+                              <includeGroupIds>org.helgoboss</includeGroupIds>
+                              <scope>compile</scope>
+                            </configuration>
+                          </execution>
+                        </executions>
+                    </plugin>
+                    
+                    <!-- Let Scaladoc include the dependency sources -->
+                    <plugin>
+                        <groupId>net.alchim31.maven</groupId>
+                        <artifactId>scala-maven-plugin</artifactId>
+                        <version>3.1.3</version>
                         <executions>
                             <execution>
                                 <id>scaladoc</id>
@@ -51,9 +79,18 @@
                                 <goals>
                                     <goal>doc</goal>
                                 </goals>
+                                <configuration>
+                                    <sourceDir>${project.build.directory}/sources</sourceDir>
+                                    <args>
+                                        <arg>-groups</arg>
+                                        <arg>-implicits</arg>
+                                    </args>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
+                    
+                    <!-- Point the javadoc plugin to the scaladocs directory so we get a javadoc artifact -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
